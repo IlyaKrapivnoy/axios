@@ -101,6 +101,9 @@ function getTodos() {
   function errorHandling() {
     axios
       .get('https://jsonplaceholder.typicode.com/todoss', {
+      // validateStatus: function(status) {
+      //   return status < 500; // Reject only if status is greater or equal to 500
+      // }
       })
       .then(res => showOutput(res))
       .catch(err => {
@@ -124,7 +127,22 @@ function getTodos() {
   
   // CANCEL TOKEN
   function cancelToken() {
-    console.log('Cancel Token');
+    const source = axios.CancelToken.source();
+  
+    axios
+      .get('https://jsonplaceholder.typicode.com/todos', {
+        cancelToken: source.token
+      })
+      .then(res => showOutput(res))
+      .catch(thrown => {
+        if (axios.isCancel(thrown)) {
+          console.log('Request canceled', thrown.message);
+        }
+      });
+  
+    if (true) {
+      source.cancel('Request canceled!');
+    }
   }
   
   // INTERCEPTING REQUESTS & RESPONSES
@@ -141,6 +159,11 @@ function getTodos() {
 )
 
   // AXIOS INSTANCES
+  const axiosInstance = axios.create({
+    // Other custom settings
+    baseURL: 'https://jsonplaceholder.typicode.com'
+  });
+  // axiosInstance.get('/comments').then(res => showOutput(res));
   
   // Show output in browser
   function showOutput(res) {
